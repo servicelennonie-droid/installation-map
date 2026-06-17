@@ -200,22 +200,36 @@ fetch(CSV_URL)
        const marker = L.marker([r.lat, r.lng])
 .addTo(map)
 .bindPopup(`
-    <b>${r.eircode}</b><br>
-    ${r.address}<br>
-    ${r.county}<br><br>
+<b>${r.eircode}</b><br>
+${r.address}<br>
+${r.county}<br><br>
 
-    ${r.ticketUrl && r.ticketUrl.startsWith('http')
-      ? `<a href="${r.ticketUrl}" target="_blank">
-           🎫 Open Zoho Ticket
-         </a><br><br>`
-      : ''}
+${r.team ? `
+<span style="
+  background:${teamColors[r.team] || '#666'};
+  color:white;
+  padding:4px 8px;
+  border-radius:10px;
+  font-weight:bold;
+  display:inline-block;
+  margin-bottom:8px;
+">
+  ${r.team}
+</span>
+<br><br>
+` : ''}
 
-    <a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
-       target="_blank">
-       🧭 Navigate
-    </a>
+${r.ticketUrl && r.ticketUrl.startsWith('http')
+  ? `<a href="${r.ticketUrl}" target="_blank">
+       🎫 Open Zoho Ticket
+     </a><br><br>`
+  : ''}
+
+<a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
+   target="_blank">
+   🧭 Navigate
+</a>
 `)
-
         markers.push(marker);
     });
 
