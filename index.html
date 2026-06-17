@@ -83,7 +83,7 @@ input{
 <script>
 
 const CSV_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vRXK2ORRbNjfLgHiGVcgzGb25eACW7SSkG-m0d50-7wSmEFa-90VMIqYuzpYpbxN8AWD_-NuC3QtCRu/pub?gid=0&single=true&output=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vQZnWqbvvYEySBKmUJAQ8v5JDVnWA59IZiWnuPVi8sdZ-zEdbg-59fno1aNXG6VbkZi-5Mzg2SLUN-K/pub?output=csv";
 
 const map = L.map('map').setView([53.35,-7.7],7);
 
@@ -119,7 +119,9 @@ function render(filter=''){
    d.innerHTML = `
     <b>📍 ${r.eircode}</b><br>
     ${r.address}<br>
-    <small>🏛 ${r.county}</small>
+    <small>🏢 ${r.county}</small><br>
+    <small>📅 ${r.installDate}</small><br>
+    <small>👷 ${r.team}</small>
 `;
 
     d.onclick = () => {
@@ -159,19 +161,23 @@ fetch(CSV_URL)
 
         const p=line.match(/(".*?"|[^,]+)(?=,|$)/g)||[];
 
-       return {
+      return {
 
-    address:(p[0]||'').replaceAll('"',''),
+    installDate:(p[0]||'').replaceAll('"',''),
 
-    county:(p[1]||'').replaceAll('"',''),
+    address:(p[1]||'').replaceAll('"',''),
 
-    eircode:(p[2]||'').replaceAll('"',''),
+    county:(p[2]||'').replaceAll('"',''),
 
-    lat:parseFloat(p[3]),
+    eircode:(p[3]||'').replaceAll('"',''),
 
-    lng:parseFloat(p[4]),
+    lat:parseFloat(p[4]),
 
-    ticketUrl:(p[6]||'').replaceAll('"','')
+    lng:parseFloat(p[5]),
+
+    team:(p[6]||'').replaceAll('"',''),
+
+    notes:(p[7]||'').replaceAll('"','')
 
 };
     });
