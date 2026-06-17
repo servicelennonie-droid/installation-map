@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service Map</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+}
+
+#wrap{
+    display:flex;
+    height:100vh;
+}
+
+#sidebar{
+    width:320px;
+    border-right:1px solid #ccc;
+    overflow:auto;
+    padding:10px;
+    box-sizing:border-box;
+}
+
+#map{
+    flex:1;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    box-sizing:border-box;
+}
+
+.item{
+    padding:10px;
+    border-bottom:1px solid #ddd;
+    cursor:pointer;
+    transition:background 0.2s;
+}
+
+.item:hover{
+    background:#f0f7ff;
+}
+
+@media(max-width:768px){
+    #wrap{
+        flex-direction:column;
+    }
+
+    #sidebar{
+        width:auto;
+        height:40vh;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+
+    <div id="sidebar">
+        <h2>Service Locations</h2>
+
+        <input id="search" placeholder="Search Eircode or Address">
+
+        <p id="status">Loading...</p>
+
+        <div id="list"></div>
+    </div>
+
+    <div id="map"></div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+const CSV_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRXK2ORRbNjfLgHiGVcgzGb25eACW7SSkG-m0d50-7wSmEFa-90VMIqYuzpYpbxN8AWD_-NuC3QtCRu/pub?gid=0&single=true&output=csv";
+
+const map = L.map('map').setView([53.35,-7.7],7);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+    attribution:'© OpenStreetMap'
+}).addTo(map);
+
+let rows = [];
+let markers = [];
+
+function render(filter=''){
+
+    const list = document.getElementById('list');
+
+    const f = filter.toLowerCase();
+
+    const filtered = rows.filter(r =>
+        (r.address + ' ' + r.eircode)
+        .toLowerCase()
+        .includes(f)
+    );
+
+    list.innerHTML='';
+
+   filtered.forEach(r => {
+
+    const d = document.createElement('div');
+
+    d.className = 'item';
+
+   d.innerHTML = `
+    <b>📍 ${r.eircode}</b><br>
+    ${r.address}<br>
+    <small>🏛 ${r.county}</small>
+`;
+
+    d.onclick = () => {
+
+        map.setView([r.lat, r.lng], 14);
+
+        markers.forEach(m => {
+
+            if (
+                m.getLatLng().lat === r.lat &&
+                m.getLatLng().lng === r.lng
+            ) {
+                m.openPopup();
+            }
+
+        });
+
+    };
+
+    list.appendChild(d);
+
+});
+
+    document.getElementById('status').textContent =
+        filtered.length + ' locations loaded';
+}
+
+fetch(CSV_URL)
+
+.then(r=>r.text())
+
+.then(text=>{
+
+    const lines=text.trim().split(/\r?\n/).slice(1);
+
+    rows=lines.map(line=>{
+
+        const p=line.match(/(".*?"|[^,]+)(?=,|$)/g)||[];
+
+       return {
+
+    address:(p[0]||'').replaceAll('"',''),
+
+    county:(p[1]||'').replaceAll('"',''),
+
+    eircode:(p[2]||'').replaceAll('"',''),
+
+    lat:parseFloat(p[3]),
+
+    lng:parseFloat(p[4]),
+
+    ticketUrl:(p[6]||'').replaceAll('"','')
+
+};
+    });
+
+    rows.forEach(r=>{
+
+        if(isNaN(r.lat) || isNaN(r.lng))
+            return;
+
+       const marker = L.marker([r.lat, r.lng])
+.addTo(map)
+.bindPopup(`
+    <b>${r.eircode}</b><br>
+    ${r.address}<br>
+    ${r.county}<br><br>
+
+    ${r.ticketUrl && r.ticketUrl.startsWith('http')
+      ? `<a href="${r.ticketUrl}" target="_blank">
+           🎫 Open Zoho Ticket
+         </a><br><br>`
+      : ''}
+
+    <a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
+       target="_blank">
+       🧭 Navigate
+    </a>
+`)
+
+        markers.push(marker);
+    });
+
+    render();
+
+})
+
+.catch(()=>{
+
+    document.getElementById('status').textContent =
+        'Could not load Google Sheet';
+
+});
+
+document
+.getElementById('search')
+.addEventListener('input',e=>{
+    render(e.target.value);
+});
+
+</script>
+
+</body>
+</html>
