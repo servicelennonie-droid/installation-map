@@ -123,10 +123,10 @@ function render(filter=''){
     <small>📅 ${r.installDate}</small><br>
     <small style="
 color:
-${r.team === 'Alpha' ? 'green' :
-  r.team === 'Bravo' ? 'blue' :
-  r.team === 'Charlie' ? 'orange' :
-  r.team === 'Delta' ? 'purple' :
+${r.team.includes('Alpha') ? 'green' :
+  r.team.includes('Bravo') ? 'blue' :
+  r.team.includes('Charlie') ? 'orange' :
+  r.team.includes('Delta') ? 'purple' :
   'black'};
 font-weight:bold;
 ">
