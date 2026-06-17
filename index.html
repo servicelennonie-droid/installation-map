@@ -121,7 +121,17 @@ function render(filter=''){
     ${r.address}<br>
     <small>🏢 ${r.county}</small><br>
     <small>📅 ${r.installDate}</small><br>
-    <small>👷 ${r.team}</small>
+    <small style="
+color:
+${r.team === 'Alpha' ? 'green' :
+  r.team === 'Bravo' ? 'blue' :
+  r.team === 'Charlie' ? 'orange' :
+  r.team === 'Delta' ? 'purple' :
+  'black'};
+font-weight:bold;
+">
+👷 ${r.team}
+</small>
 `;
 
     d.onclick = () => {
