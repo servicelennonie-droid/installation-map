@@ -104,6 +104,25 @@ function teamColor(team){
     return 'black';
 }
 
+function teamIcon(team){
+    const color = teamColor(team);
+
+    const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="42" viewBox="0 0 30 42">
+  <path d="M15 0C7 0 0 6.7 0 15c0 10 15 27 15 27s15-17 15-27C30 6.7 23 0 15 0z"
+        fill="${color}" stroke="white" stroke-width="2"/>
+  <circle cx="15" cy="15" r="6" fill="white"/>
+</svg>`;
+
+    return L.divIcon({
+        html: svg,
+        className: '',
+        iconSize: [30,42],
+        iconAnchor: [15,42],
+        popupAnchor: [0,-36]
+    });
+}
+
 function render(filter=''){
 
     const list = document.getElementById('list');
@@ -197,7 +216,7 @@ fetch(CSV_URL)
         if(isNaN(r.lat) || isNaN(r.lng))
             return;
 
-       const marker = L.marker([r.lat, r.lng])
+       const marker = L.marker([r.lat, r.lng], { icon: teamIcon(r.team) })
 .addTo(map)
 .bindPopup(`
     <b>${r.eircode}</b><br>
