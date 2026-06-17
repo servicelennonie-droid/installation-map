@@ -96,6 +96,14 @@ L.tileLayer(
 let rows = [];
 let markers = [];
 
+function teamColor(team){
+    if (team.includes('Alpha')) return 'green';
+    if (team.includes('Bravo')) return 'blue';
+    if (team.includes('Charlie')) return 'orange';
+    if (team.includes('Delta')) return 'purple';
+    return 'black';
+}
+
 function render(filter=''){
 
     const list = document.getElementById('list');
@@ -121,15 +129,7 @@ function render(filter=''){
     ${r.address}<br>
     <small>🏢 ${r.county}</small><br>
     <small>📅 ${r.installDate}</small><br>
-    <small style="
-color:
-${r.team.includes('Alpha') ? 'green' :
-  r.team.includes('Bravo') ? 'blue' :
-  r.team.includes('Charlie') ? 'orange' :
-  r.team.includes('Delta') ? 'purple' :
-  'black'};
-font-weight:bold;
-">
+    <small style="color:${teamColor(r.team)};font-weight:bold;">
 👷 ${r.team}
 </small>
 `;
@@ -204,11 +204,10 @@ fetch(CSV_URL)
     ${r.address}<br>
     ${r.county}<br><br>
 
-    ${r.ticketUrl && r.ticketUrl.startsWith('http')
-      ? `<a href="${r.ticketUrl}" target="_blank">
-           🎫 Open Zoho Ticket
-         </a><br><br>`
-      : ''}
+    📅 ${r.installDate}<br>
+    <span style="color:${teamColor(r.team)};font-weight:bold;">
+       👷 ${r.team}
+    </span><br><br>
 
     <a href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}"
        target="_blank">
